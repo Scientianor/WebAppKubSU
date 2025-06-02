@@ -16,11 +16,11 @@ npm run build
 ```
 2. Сборка образа Docker
 ```bash
-docker build -f Dockerfile -t WebAppKubSU .
+docker build -f Dockerfile -t webappkubsu .
 ```
 3. Сборка образа Docker
 ```bash
-docker run -p 3003:3003 WebAppKubSU
+docker run -p 3003:3003 webappkubsu
 ```
 
 ### Дополнительно
