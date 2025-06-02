@@ -1,24 +1,14 @@
-# Стадия сборки
+# Сборка Vite
 FROM node:22 AS build
 WORKDIR /app
-
 COPY package*.json ./
 RUN npm ci
-
 COPY . .
+RUN npm run build
 
-# Выполняем сборку (создаёт dist/)
-RUN npm run build && ls -la /app/dist
+# Запуск — nginx только для отдачи фронта
+FROM nginx:alpine
+COPY --from=build /app/dist /usr/share/nginx/html
+COPY nginx.conf /etc/nginx/conf.d/default.conf
 
-# Стадия запуска
-FROM node:22-slim AS production
-WORKDIR /app
-
-RUN npm install -g serve
-
-# Копируем dist вместо build
-COPY --from=build /app/dist ./dist
-
-EXPOSE 3003
-
-CMD ["serve", "-s", "dist", "-l", "3003"]
+EXPOSE 80
