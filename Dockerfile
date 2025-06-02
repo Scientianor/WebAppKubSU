@@ -1,16 +1,24 @@
 # Стадия сборки
 FROM node:22 AS build
 WORKDIR /app
+
 COPY package*.json ./
 RUN npm ci
+
 COPY . .
-RUN npm run build
 
-# Стадия запуска — на nginx
-FROM nginx:alpine
-COPY --from=build /app/dist /usr/share/nginx/html
+# Выполняем сборку (создаёт dist/)
+RUN npm run build && ls -la /app/dist
 
-# Пользовательская конфигурация nginx, если надо
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+# Стадия запуска
+FROM node:22-slim AS production
+WORKDIR /app
+
+RUN npm install -g serve
+
+# Копируем dist вместо build
+COPY --from=build /app/dist ./dist
 
 EXPOSE 3003
+
+CMD ["serve", "-s", "dist", "-l", "3003"]
