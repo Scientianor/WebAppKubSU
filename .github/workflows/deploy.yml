@@ -1,4 +1,4 @@
-name: Deploy Nginx
+name: Deploy React App
 
 on:
   push:
@@ -20,24 +20,23 @@ jobs:
         chmod 600 ~/.ssh/id_rsa
         ssh-keyscan -p 22 ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
 
-    - name: SSH into server, deploy configs, reload Nginx
+    - name: SSH into server, deploy configs
       run: |
         ssh -i ~/.ssh/id_rsa -p 22 ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
           set -e
 
           cd /root/WebAppKubSU
           git pull origin master
-          
-          docker stop webappkubsu
-          docker rm webappkubsu
+
+          echo "Stopping and removing old container..."
+          docker stop webappkubsu || true
+          docker rm webappkubsu || true
+
+          echo "Rebuilding image..."
           docker build -t webappkubsu .
-          docker run -d -p 3003:80 webappkubsu
 
-          # Проверяем конфигурацию
-          sudo nginx -t
+          echo "Running container with name..."
+          docker run -d --name webappkubsu -p 3003:80 webappkubsu
 
-          # Применяем изменения
-          sudo systemctl reload nginx
-
-          echo "Конфигурация обновлена и Nginx перезагружен"
+          echo "✅ Деплой завершён успешно"
         EOF
