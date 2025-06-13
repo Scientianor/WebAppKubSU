@@ -24,7 +24,7 @@ function App() {
                     axios.get('https://v6.exchangerate-api.com/v6/3ee38075a1e840e9ef7b3a24/latest/CNY'),
                 ]);
 
-                const ipResponse = await axios.get('https://ipconfig.io/json');
+                const ipResponse = await axios.get('https://ipinfo.io/json?token=a6cdee07cef0e0');
                 setIpData(ipResponse.data);
 
                 const USDrate = usd.data.conversion_rates.RUB.toFixed(2).replace('.', ',');
@@ -171,24 +171,23 @@ function App() {
 
                         {/* Данные об IP */}
                         {ipData && (
-                            <div className="container">
-                                <div className="header-container">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"
-                                         viewBox="0 0 24 24">
-                                        <path fill="#E9E9E9" d="M4 4h16v2H4zm0 4h10v2H4zm0 4h16v2H4zm0 4h10v2H4z"/>
-                                    </svg>
-                                    <span>Информация об IP</span>
-                                </div>
-                                <div>IP: {ipData.ip}</div>
-                                <div>Страна: {ipData.country} ({ipData.country_iso})</div>
-                                <div>Координаты: {ipData.latitude}, {ipData.longitude}</div>
-                                <div>Часовой пояс: {ipData.time_zone}</div>
-                                <div>Браузер: {ipData.user_agent.product} {ipData.user_agent.version}</div>
-                                <div style={{fontSize: '0.8em', opacity: 0.6}}>
-                                    {ipData.user_agent.comment}
-                                </div>
-                            </div>
-                        )}
+    <div className="container">
+        <div className="header-container">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"
+                 viewBox="0 0 24 24">
+                <path fill="#E9E9E9" d="M4 4h16v2H4zm0 4h10v2H4zm0 4h16v2H4zm0 4h10v2H4z"/>
+            </svg>
+            <span>Информация об IP</span>
+        </div>
+        <div>IP: {ipData.ip}</div>
+        <div>Город: {ipData.city}</div>
+        <div>Регион: {ipData.region}</div>
+        <div>Страна: {ipData.country}</div>
+        <div>Провайдер: {ipData.org}</div>
+        <div>Координаты: {ipData.loc}</div>
+        <div>Часовой пояс: {ipData.timezone}</div>
+    </div>
+)}
                     </>
                 )}
             </div>
