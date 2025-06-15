@@ -63,54 +63,50 @@ function App() {
         setTimeout(replaceLeafletFlag, 1000); // ждём загрузки карты
     }, []);
 
-    useEffect(() => {
-        async function fetchAllData() {
-            try {
-                // Курсы валют (USD, EUR, CNY) к RUB
-                const [usd, eur, cny] = await Promise.all([
-                    axios.get('https://v6.exchangerate-api.com/v6/3ee38075a1e840e9ef7b3a24/latest/USD'),
-                    axios.get('https://v6.exchangerate-api.com/v6/3ee38075a1e840e9ef7b3a24/latest/EUR'),
-                    axios.get('https://v6.exchangerate-api.com/v6/3ee38075a1e840e9ef7b3a24/latest/CNY'),
-                ]);
+useEffect(() => {
+    async function fetchAllData() {
+        try {
+            // Курсы валют (USD, EUR, CNY) к RUB
+            const [usd, eur, cny, ipResponse] = await Promise.all([
+                axios.get('https://v6.exchangerate-api.com/v6/3ee38075a1e840e9ef7b3a24/latest/USD'),
+                axios.get('https://v6.exchangerate-api.com/v6/3ee38075a1e840e9ef7b3a24/latest/EUR'),
+                axios.get('https://v6.exchangerate-api.com/v6/3ee38075a1e840e9ef7b3a24/latest/CNY'),
+                axios.get('https://ipinfo.io/json?token=a6cdee07cef0e0'),
+            ]);
 
-                const ipResponse = await axios.get('https://ipinfo.io/json?token=a6cdee07cef0e0');
-                setIpData(ipResponse.data);
+            setIpData(ipResponse.data);
 
-                const USDrate = usd.data.conversion_rates.RUB.toFixed(2).replace('.', ',');
-                const EURrate = eur.data.conversion_rates.RUB.toFixed(2).replace('.', ',');
-                const CNYrate = cny.data.conversion_rates.RUB.toFixed(2).replace('.', ',');
+            const USDrate = usd.data.conversion_rates.RUB.toFixed(2).replace('.', ',');
+            const EURrate = eur.data.conversion_rates.RUB.toFixed(2).replace('.', ',');
+            const CNYrate = cny.data.conversion_rates.RUB.toFixed(2).replace('.', ',');
 
-                setRates({USDrate, EURrate, CNYrate});
+            setRates({ USDrate, EURrate, CNYrate });
 
-                // Получаем координаты устройства
-                navigator.geolocation.getCurrentPosition(async position => {
-                    const lat = position.coords.latitude;
-                    const lon = position.coords.longitude;
+            // Погода по IP-геолокации
+            if (ipResponse.data.loc) {
+                const [lat, lon] = ipResponse.data.loc.split(',');
 
-                    const weatherResponse = await axios.get(
-                        `https://api.weather.yandex.ru/v2/forecast?lat=${lat}&lon=${lon}&lang=ru_RU`,
-                        {
-                            headers: {
-                                'X-Yandex-Weather-Key': '5254d49c-4ca4-44f5-b90e-c3a9c6cd038f'
-                            }
+                const weatherResponse = await axios.get(
+                    `https://api.weather.yandex.ru/v2/forecast?lat=${lat}&lon=${lon}&lang=ru_RU`,
+                    {
+                        headers: {
+                            'X-Yandex-Weather-Key': '5254d49c-4ca4-44f5-b90e-c3a9c6cd038f'
                         }
-                    );
+                    }
+                );
 
-                    setWeatherData(weatherResponse.data);
-                }, error => {
-                    console.error('Ошибка получения геолокации:', error);
-                    setError('Не удалось получить координаты устройства.');
-                });
-            } catch (err) {
-                console.error('Ошибка загрузки данных:', err);
-                setError('Ошибка загрузки данных.');
-            } finally {
-                setLoading(false);
+                setWeatherData(weatherResponse.data);
             }
+        } catch (err) {
+            console.error('Ошибка загрузки данных:', err);
+            setError('Ошибка загрузки данных.');
+        } finally {
+            setLoading(false);
         }
+    }
 
-        fetchAllData();
-    }, []);
+    fetchAllData();
+}, []);
 
     useEffect(() => {
         const storedTasks = localStorage.getItem(TASKS_STORAGE_KEY);
@@ -152,7 +148,7 @@ function App() {
                 {!loading && error && <p style={{color: 'red'}}>{error}</p>}
                 {!loading && !error && (
                     <>
-                        <div style={{display: 'flex', gap: '1rem', flexDirection: 'column', maxWidth: 'min-content'}}>
+                        <div style={{display: 'flex', gap: '1rem', flexDirection: 'column'}}>
                             {/* Курс валют */}
                             <div className="container width-100">
                                 <div className="header-container">
@@ -196,7 +192,7 @@ function App() {
                                                style={{
                                                    color: 'var(--color)',
                                                    whiteSpace: 'nowrap',
-                                                   fontSize: '1rem',
+                                                   fontSize: '.85rem',
                                                    fontWeight: 'bold',
                                                    textDecoration: 'none',
                                                    overflow: 'hidden',
@@ -206,7 +202,7 @@ function App() {
                                                }}>
                                                 {article.title.length > 32 ? article.title.slice(0, 32) + '…' : article.title}
                                             </a>
-                                            <div style={{fontSize: '0.75rem', color: 'rgba(255, 255, 255, 0.4)'}}>
+                                            <div style={{fontSize: '0.65rem', color: 'rgba(255, 255, 255, 0.4)'}}>
                                                 {new Date(article.publishedAt).toLocaleString('ru-RU')}
                                             </div>
                                             {article.description && (
@@ -215,7 +211,7 @@ function App() {
                                                     overflow: 'hidden',
                                                     textOverflow: 'ellipsis',
                                                     maxWidth: '250px',
-                                                    fontSize: '.85rem'
+                                                    fontSize: '.75rem'
                                                 }}>
                                                     {article.description.length > 64
                                                         ? article.description.slice(0, 64) + '…'
@@ -279,7 +275,7 @@ function App() {
 
                             {/* Данные об IP */}
                             {ipData && (
-                                <div className="container">
+                                <div className="container width-100">
                                     <div className="header-container">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                                              viewBox="0 0 24 24" fill="none">

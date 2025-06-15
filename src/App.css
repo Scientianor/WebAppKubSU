@@ -8,6 +8,42 @@
   --container-border-radius: 1rem;
 }
 
+@media (max-width: 768px) {
+  .App {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .container {
+    width: 100% !important;
+    max-width: 100%;
+    white-space: normal;
+  }
+
+  .header-container {
+    width: 100%;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+  }
+
+  .tasks-list {
+    grid-template-columns: 1fr;
+  }
+
+  form {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  input {
+    width: 100%;
+  }
+
+  button {
+    width: 100%;
+  }
+}
+
 #root {
   width: 100%;
   height: 100%;
@@ -32,7 +68,7 @@ html, body {
 .App {
   display: flex;
   justify-content: center;
-  gap: 2rem
+  gap: 1rem
 }
 
 .container {
@@ -83,9 +119,11 @@ html, body {
 }
 
 .item-text {
-  font-size: 1rem;
+  font-size: .85rem;
   font-weight: bold;
   cursor: pointer;
+  text-align: center;
+  align-content: center;
 }
 
 .strike {
@@ -105,6 +143,10 @@ html, body {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
+  background: var(--container-background);
+  border-radius: calc(var(--container-border-radius)/2);
+  border: var(--container-border-color);
+  padding: .5rem .5rem .5rem 1rem;
 }
 
 form {

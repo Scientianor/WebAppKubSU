@@ -1,8 +1,6 @@
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 
-
-
 function IPMap({ lat, lon }) {
     return (
         <MapContainer center={[lat, lon]} zoom={13} style={{ height: '12rem', width: '100%', borderRadius: 'var(--container-border-radius)', border: 'var(--container-border-color)' }}>
